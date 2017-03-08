@@ -1,13 +1,41 @@
 ﻿{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
-
-  },
-    "variables": {
+    "containerSasToken": {
+      "type": "string"
     },
-    "resources": [
-    ],
-    "outputs": {
+    "newOrExistingNetwork": {
+      "type": "string",
+      "allowedValues": [
+        "existing",
+        "new"
+      ]
     }
+  },
+  "variables": {
+    "templateBaseUrl": "https://unit21templateslrs.blob.core.windows.net/templates",
+    "networkTemplateUrl": "[concat(variables('templateBaseUrl'), parameters('newOrExistingNetwork'), '-network.json')]",
+    "networkParametersUrl": "[concat(variables('templateBaseUrl'), parameters('newOrExistingNetwork'), '-network.parameters.json')]",
+    "vmTemplateUrl": "[concat(variables('templateBaseUrl'), 'vm-1disk.json')]",
+    "vmParametersUrl": "[concat(variables('templateBaseUrl'), 'vm-1disk.parameters.json')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-01-01",
+      "name": "linkedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "templateLink": {
+          "uri": "[concat(variables('vmTemplateUrl'), parameters('containerSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('vmParametersUrl'), parameters('containerSasToken'))]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+  }
 }
