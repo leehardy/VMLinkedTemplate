@@ -2,6 +2,9 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "storageAccountName": {
+      "type": "string"
+    },
     "containerSasToken": {
       "type": "string"
     },
@@ -14,7 +17,7 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "https://unit21templateslrs.blob.core.windows.net/templates",
+    "templateBaseUrl": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net/templates')]",
     "networkTemplateUrl": "[concat(variables('templateBaseUrl'), '/', parameters('newOrExistingNetwork'), '-network.json')]",
     "networkParametersUrl": "[concat(variables('templateBaseUrl'), '/', parameters('newOrExistingNetwork'), '-network.parameters.json')]",
     "vmTemplateUrl": "[concat(variables('templateBaseUrl'), '/', 'vm-1disk.json')]",

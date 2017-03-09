@@ -27,6 +27,7 @@
   <ItemGroup>
     <None Include="deploy.json" />
     <None Include="deploy.parameters.json" />
+    <None Include="deploy.ps1" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
