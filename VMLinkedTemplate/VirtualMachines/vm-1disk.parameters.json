@@ -1,6 +1,6 @@
 ﻿{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
     "vmName": {
       "value": "testvm1"
@@ -9,10 +9,16 @@
       "value": 1023
     },
     "adminUserName": {
-      "value": "admin"
+      "value": "testadmin"
+    },
+    "adminPassword": {
+      "value": "password1234!"
     },
     "vnetName": {
       "value": "VNET01"
+    },
+    "vnetResourceGroup": {
+      "value": "network-prod-rg"
     },
     "subnetName": {
       "value": "VNET01-WEB-SUBNET"

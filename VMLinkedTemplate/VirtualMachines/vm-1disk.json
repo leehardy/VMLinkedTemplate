@@ -20,6 +20,9 @@
     "vnetName": {
       "type": "string"
     },
+    "vnetResourceGroup": {
+      "type": "string"
+    },
     "subnetName": {
       "type": "string"
     }
@@ -30,8 +33,8 @@
     "imageSku": "2012-R2-Datacenter",
     "osDiskName": "[concat(parameters('vmName'), '-osdisk')]",
     "vmSize": "Standard_D1_v2",
-    "nicName": "[concat(parameters('vmName'), '-NIC1')]",
-    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+    "nicName": "[concat(parameters('vmName'), '-nic1')]",
+    "vnetId": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
   },
   "resources": [
@@ -41,7 +44,6 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [
-        "[variables('vnetId')]"
       ],
       "tags": {
       },

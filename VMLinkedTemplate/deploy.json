@@ -15,10 +15,10 @@
   },
   "variables": {
     "templateBaseUrl": "https://unit21templateslrs.blob.core.windows.net/templates",
-    "networkTemplateUrl": "[concat(variables('templateBaseUrl'), parameters('newOrExistingNetwork'), '-network.json')]",
-    "networkParametersUrl": "[concat(variables('templateBaseUrl'), parameters('newOrExistingNetwork'), '-network.parameters.json')]",
-    "vmTemplateUrl": "[concat(variables('templateBaseUrl'), 'vm-1disk.json')]",
-    "vmParametersUrl": "[concat(variables('templateBaseUrl'), 'vm-1disk.parameters.json')]"
+    "networkTemplateUrl": "[concat(variables('templateBaseUrl'), '/', parameters('newOrExistingNetwork'), '-network.json')]",
+    "networkParametersUrl": "[concat(variables('templateBaseUrl'), '/', parameters('newOrExistingNetwork'), '-network.parameters.json')]",
+    "vmTemplateUrl": "[concat(variables('templateBaseUrl'), '/', 'vm-1disk.json')]",
+    "vmParametersUrl": "[concat(variables('templateBaseUrl'), '/', 'vm-1disk.parameters.json')]"
   },
   "resources": [
     {
@@ -26,6 +26,7 @@
       "name": "linkedTemplate",
       "type": "Microsoft.Resources/deployments",
       "properties": {
+        "mode": "Incremental",
         "templateLink": {
           "uri": "[concat(variables('vmTemplateUrl'), parameters('containerSasToken'))]",
           "contentVersion": "1.0.0.0"

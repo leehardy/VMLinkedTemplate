@@ -1,9 +1,12 @@
 ﻿{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
     "newOrExistingNetwork": {
       "value": "existing"
+    },
+    "containerSasToken": {
+      "value": "?sv=2015-04-05&sr=c&sig=5DY8Rx3cvrbd2MiEjd%2FzXbAK0g0gLuBTq%2FaPnSzg3DI%3D&se=2017-03-09T01%3A36%3A08Z&sp=rwdl"
     }
   }
 }
