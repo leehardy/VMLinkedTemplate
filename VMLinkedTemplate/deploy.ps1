@@ -10,7 +10,7 @@ $deploymentResourceGroup = "vm-prod-rg"
 
 function createStorageAccount ($resourceGroup) {
 	Do {
-		$saPrefix = -join ((97..122) | Get-Random -Count 10 | % {[char]$_})
+		$saPrefix = -join ((97..122) | Get-Random -Count 19 | % {[char]$_})
 		$saRandName = $saPrefix + "slrs1"
 		$sa = Get-AzureRmStorageAccount -Name $saRandName -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
 	} While ($sa)
