@@ -7,7 +7,6 @@ $containerName = "templates"
 $policyName = "templateDeploymentPolicy"
 $deploymentResourceGroup = "vm-prod-rg"
 
-
 function createStorageAccount ($resourceGroup) {
 	Do {
 		$saPrefix = -join ((97..122) | Get-Random -Count 19 | % {[char]$_})
@@ -18,7 +17,14 @@ function createStorageAccount ($resourceGroup) {
 	New-AzureRmStorageAccount -Name $saRandName -ResourceGroupName $resourceGroup -SkuName Standard_LRS -Location australiaeast -Kind Storage
 }
 
-Login-AzureRmAccount
+# Check if there's currently a logged in Azure Session
+Try {
+  Get-AzureRmContext
+} Catch {
+  if ($_ -like "*Login-AzureRmAccount to login*") {
+    Login-AzureRmAccount
+  }
+}
 
 $storageAccountName = (createStorageAccount($storageAccountResourceGroup)).StorageAccountName
 Set-AzureRmCurrentStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup
@@ -34,5 +40,5 @@ foreach ($template in $templates) {
 
 New-AzureRmResourceGroupDeployment -Name "NewVM" -ResourceGroupName $deploymentResourceGroup -TemplateFile ".\deploy.json" -TemplateParameterFile ".\deploy.parameters.json" -containerSasToken $sasToken  -storageAccountName $storageAccountName
 
-Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup -Confirm
+Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup -Confirm:$false
 
