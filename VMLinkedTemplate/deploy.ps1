@@ -4,7 +4,7 @@ $templateFolder = "C:\Users\Lee Hardy\Documents\git-repos\VMLinkedTemplate\VMLin
 $templates = Get-ChildItem $templateFolder
 $storageAccountResourceGroup = "storage-prod-rg"
 $containerName = "templates"
-$policyName = "templateDeploymentPolicy"
+$accessPolicyName = "templateDeploymentPolicy"
 $deploymentResourceGroup = "vm-prod-rg"
 
 function createStorageAccount ($resourceGroup) {
@@ -29,8 +29,8 @@ Try {
 $storageAccountName = (createStorageAccount($storageAccountResourceGroup)).StorageAccountName
 Set-AzureRmCurrentStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup
 
-New-AzureStorageContainer -Name templates
-New-AzureStorageContainerStoredAccessPolicy -Policy $policyName -Container $containerName -Permission rl -StartTime $now -ExpiryTime $expiry
+New-AzureStorageContainer -Name templates -Permission Off
+New-AzureStorageContainerStoredAccessPolicy -Policy $accessPolicyName -Container $containerName -Permission rl -StartTime $now -ExpiryTime $expiry
 $sasToken = New-AzureStorageContainerSASToken -Name $containerName -Policy $policyName
 
 foreach ($template in $templates) {
@@ -40,5 +40,5 @@ foreach ($template in $templates) {
 
 New-AzureRmResourceGroupDeployment -Name "NewVM" -ResourceGroupName $deploymentResourceGroup -TemplateFile ".\deploy.json" -TemplateParameterFile ".\deploy.parameters.json" -containerSasToken $sasToken  -storageAccountName $storageAccountName
 
-Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup -Confirm:$false
+Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup -Force
 
