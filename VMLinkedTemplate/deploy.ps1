@@ -1,11 +1,11 @@
 $now = Get-Date
 $expiry = (Get-Date).AddHours(2)
-$templateFolder = "C:\Users\Lee Hardy\Documents\git-repos\VMLinkedTemplate\VMLinkedTemplate\VirtualMachines"
+$templateFolder = ".\VirtualMachines"
 $templates = Get-ChildItem $templateFolder
-$storageAccountResourceGroup = "storage-prod-rg"
 $containerName = "templates"
 $accessPolicyName = "templateDeploymentPolicy"
 $deploymentResourceGroup = "vm-prod-rg"
+$location = "australiaeast"
 
 function createStorageAccount ($resourceGroup) {
 	Do {
@@ -26,12 +26,17 @@ Try {
   }
 }
 
-$storageAccountName = (createStorageAccount($storageAccountResourceGroup)).StorageAccountName
-Set-AzureRmCurrentStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup
+$exists = Get-AzureRmResourceGroup -Name $deploymentResourceGroup -ErrorAction SilentlyContinue
+If (!$exists) {
+	New-AzureRmResourceGroup -Name $deploymentResourceGroup -Location $location
+}
+
+$storageAccountName = (createStorageAccount($deploymentResourceGroup)).StorageAccountName
+Set-AzureRmCurrentStorageAccount -Name $storageAccountName -ResourceGroupName $deploymentResourceGroup
 
 New-AzureStorageContainer -Name templates -Permission Off
 New-AzureStorageContainerStoredAccessPolicy -Policy $accessPolicyName -Container $containerName -Permission rl -StartTime $now -ExpiryTime $expiry
-$sasToken = New-AzureStorageContainerSASToken -Name $containerName -Policy $policyName
+$sasToken = New-AzureStorageContainerSASToken -Name $containerName -Policy $accessPolicyName
 
 foreach ($template in $templates) {
 	$templateToUpload = "$templateFolder\$template"
@@ -40,5 +45,5 @@ foreach ($template in $templates) {
 
 New-AzureRmResourceGroupDeployment -Name "NewVM" -ResourceGroupName $deploymentResourceGroup -TemplateFile ".\deploy.json" -TemplateParameterFile ".\deploy.parameters.json" -containerSasToken $sasToken  -storageAccountName $storageAccountName
 
-Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup -Force
+Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $deploymentResourceGroup -Force
 
