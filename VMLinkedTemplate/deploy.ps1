@@ -4,7 +4,7 @@ $templateFolder = ".\VirtualMachines"
 $templates = Get-ChildItem $templateFolder
 $containerName = "templates"
 $accessPolicyName = "templateDeploymentPolicy"
-$deploymentResourceGroup = "vm-prod-rg"
+$deploymentResourceGroup = "vm-aea-rg"
 $location = "australiaeast"
 
 function createStorageAccount ($resourceGroup) {
