@@ -2,11 +2,12 @@ $now = Get-Date
 $expiry = (Get-Date).AddHours(2)
 $templateFolder = "C:\Users\Lee Hardy\Documents\git-repos\VMLinkedTemplate\VMLinkedTemplate\VirtualMachines"
 $templates = Get-ChildItem $templateFolder
-$storageAccountResourceGroup = "storage-prod-rg"
 $containerName = "templates"
 $policyName = "templateDeploymentPolicy"
 $deploymentResourceGroup = "vm-prod-rg"
+$deploymentResourceGroupLocation = "australiaeast"
 
+# Generates a random name for the storage account, checks if it exists and if so generate a new name, else create the Storage Account
 function createStorageAccount ($resourceGroup) {
 	Do {
 		$saPrefix = -join ((97..122) | Get-Random -Count 19 | % {[char]$_})
@@ -14,7 +15,7 @@ function createStorageAccount ($resourceGroup) {
 		$sa = Get-AzureRmStorageAccount -Name $saRandName -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
 	} While ($sa)
 
-	New-AzureRmStorageAccount -Name $saRandName -ResourceGroupName $resourceGroup -SkuName Standard_LRS -Location australiaeast -Kind Storage
+	New-AzureRmStorageAccount -Name $saRandName -ResourceGroupName $resourceGroup -SkuName Standard_LRS -Location $deploymentResourceGroupLocation -Kind Storage
 }
 
 # Check if there's currently a logged in Azure Session
@@ -26,19 +27,29 @@ Try {
   }
 }
 
-$storageAccountName = (createStorageAccount($storageAccountResourceGroup)).StorageAccountName
-Set-AzureRmCurrentStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup
+# Check if the resource group exists, if not create it
+$resourceGroupExists = Get-AzureRmResourceGroup -Name $deploymentResourceGroup -ErrorAction SilentlyContinue
+if (!$resourceGroupExists) {
+	New-AzureRmResourceGroup -Name $deploymentResourceGroup -Location $deploymentResourceGroupLocation
+}
+
+# Create Storage Account and get SAS token for deployment
+$storageAccountName = (createStorageAccount($deploymentResourceGroup)).StorageAccountName
+Set-AzureRmCurrentStorageAccount -Name $storageAccountName -ResourceGroupName $deploymentResourceGroup
 
 New-AzureStorageContainer -Name templates
 New-AzureStorageContainerStoredAccessPolicy -Policy $policyName -Container $containerName -Permission rl -StartTime $now -ExpiryTime $expiry
 $sasToken = New-AzureStorageContainerSASToken -Name $containerName -Policy $policyName
 
+# Upload templates to Storage Account
 foreach ($template in $templates) {
 	$templateToUpload = "$templateFolder\$template"
 	Set-AzureStorageBlobContent -File $templateToUpload -Container $containerName -Blob $template -Force
 }
 
+# Perform ARM deployment
 New-AzureRmResourceGroupDeployment -Name "NewVM" -ResourceGroupName $deploymentResourceGroup -TemplateFile ".\deploy.json" -TemplateParameterFile ".\deploy.parameters.json" -containerSasToken $sasToken  -storageAccountName $storageAccountName
 
-Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $storageAccountResourceGroup -Confirm:$false
+# Cleanup
+Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $deploymentResourceGroup -Confirm:$false
 
