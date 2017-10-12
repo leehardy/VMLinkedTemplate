@@ -1,6 +1,6 @@
 $now = Get-Date
 $expiry = (Get-Date).AddHours(2)
-$templateFolder = "C:\Users\Lee Hardy\Documents\git-repos\VMLinkedTemplate\VMLinkedTemplate\VirtualMachines"
+$templateFolder = ".\VirtualMachines"
 $templates = Get-ChildItem $templateFolder
 $containerName = "templates"
 $policyName = "templateDeploymentPolicy"
@@ -27,6 +27,7 @@ Try {
   }
 }
 
+
 # Check if the resource group exists, if not create it
 $resourceGroupExists = Get-AzureRmResourceGroup -Name $deploymentResourceGroup -ErrorAction SilentlyContinue
 if (!$resourceGroupExists) {
@@ -37,9 +38,9 @@ if (!$resourceGroupExists) {
 $storageAccountName = (createStorageAccount($deploymentResourceGroup)).StorageAccountName
 Set-AzureRmCurrentStorageAccount -Name $storageAccountName -ResourceGroupName $deploymentResourceGroup
 
-New-AzureStorageContainer -Name templates
-New-AzureStorageContainerStoredAccessPolicy -Policy $policyName -Container $containerName -Permission rl -StartTime $now -ExpiryTime $expiry
-$sasToken = New-AzureStorageContainerSASToken -Name $containerName -Policy $policyName
+New-AzureStorageContainer -Name templates -Permission Off
+New-AzureStorageContainerStoredAccessPolicy -Policy $accessPolicyName -Container $containerName -Permission rl -StartTime $now -ExpiryTime $expiry
+$sasToken = New-AzureStorageContainerSASToken -Name $containerName -Policy $accessPolicyName
 
 # Upload templates to Storage Account
 foreach ($template in $templates) {
@@ -49,6 +50,7 @@ foreach ($template in $templates) {
 
 # Perform ARM deployment
 New-AzureRmResourceGroupDeployment -Name "NewVM" -ResourceGroupName $deploymentResourceGroup -TemplateFile ".\deploy.json" -TemplateParameterFile ".\deploy.parameters.json" -containerSasToken $sasToken  -storageAccountName $storageAccountName
+
 
 # Cleanup
 Remove-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $deploymentResourceGroup -Confirm:$false
