@@ -30,10 +30,10 @@
   "variables": {
     "imagePublisher": "MicrosoftWindowsServer",
     "imageOffer": "WindowsServer",
-    "imageSku": "2012-R2-Datacenter",
-    "osDiskName": "[concat(parameters('vmName'), '-osdisk')]",
-    "vmSize": "Standard_D1_v2",
-    "nicName": "[concat(parameters('vmName'), '-nic1')]",
+    "imageSku": "2016-Datacenter",
+    "osDiskName": "[concat(parameters('vmName'), '-OSDISK')]",
+    "vmSize": "Standard_DS1_v2",
+    "nicName": "[concat(parameters('vmName'), '-NIC1')]",
     "vnetId": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
   },
@@ -53,6 +53,7 @@
             "name": "ipconfig",
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
+              "publicIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[variables('subnetRef')]"
               }
