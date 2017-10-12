@@ -4,8 +4,8 @@ $templateFolder = "C:\Users\Lee Hardy\Documents\git-repos\VMLinkedTemplate\VMLin
 $templates = Get-ChildItem $templateFolder
 $containerName = "templates"
 $policyName = "templateDeploymentPolicy"
-$deploymentResourceGroup = "vm-prod-rg"
-$deploymentResourceGroupLocation = "australiaeast"
+$deploymentResourceGroup = "SEA-VM-RSG"
+$deploymentResourceGroupLocation = "southeastasia"
 
 # Generates a random name for the storage account, checks if it exists and if so generate a new name, else create the Storage Account
 function createStorageAccount ($resourceGroup) {

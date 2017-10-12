@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmName": {
-      "value": "testvm1"
+      "value": "APP-SEA-VM-01"
     },
     "dataDiskSizeGb": {
-      "value": 1023
+      "value": 127
     },
     "adminUserName": {
       "value": "testadmin"
@@ -15,13 +15,13 @@
       "value": "password1234!"
     },
     "vnetName": {
-      "value": "VNET01"
+      "value": "SEA-VNET01"
     },
     "vnetResourceGroup": {
-      "value": "network-prod-rg"
+      "value": "SEA-ALL-RSG"
     },
     "subnetName": {
-      "value": "VNET01-WEB-SUBNET"
+      "value": "subnet1"
     }
   }
 }
